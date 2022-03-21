@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ego.dao.AdminMapper">
+
+<!--增加管理员，参数为admin实体类-->
+    <insert id="addAdmin" parameterType="com.ego.pojo.Admin">
+        insert into egoweb.ego_admin(account, name, pwd)
+        values (#{account},#{name},#{pwd});
+    </insert>
+<!--删除管理员，参数为账号，或者id-->
+    <delete id="deleteAdmin" parameterType="com.ego.pojo.Admin">
+        delete from egoweb.ego_admin
+    <where>
+        <if test="id != null">
+            id=#{id}
+        </if>
+    </where>
+    </delete>
+<!--更新管理员信息，只允许更改name和psw-->
+    <update id="updateAdmin" parameterType="map">
+        update egoweb.ego_admin
+        <set>
+            <if test="name != null">
+                name = #{name}
+            </if>
+            <if test="psw != null">
+                psw = #{psw}
+            </if>
+        </set>
+    </update>
+<!--获取指定管理员，根据id，name，或者account获取-->
+    <select id="getAdminAt" parameterType="map" resultType="com.ego.pojo.Admin">
+        select *from egoweb.ego_admin
+        <where>
+            <if test="id != null">
+                id=#{id}
+            </if>
+            <if test="name != null">
+                name=#{name}
+            </if>
+            <if test="account != null">
+                account=#{account}
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -5,7 +5,7 @@ import com.ego.pojo.Admin;
 import java.util.List;
 import java.util.Map;
 
-public interface AdminServive {
+public interface AdminService {
     List<Admin> getAllAdmin();
 
     Admin getAdminAt(Map map);
@@ -14,5 +14,5 @@ public interface AdminServive {
 
     int deleteAdmin(Admin admin);
 
-    int updateAdmin(Map map);
+    int updateAdmin(Admin admin);
 }

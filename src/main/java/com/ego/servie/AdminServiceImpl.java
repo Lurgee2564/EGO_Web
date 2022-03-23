@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class AdminServiceImpl implements AdminServive{
+public class AdminServiceImpl implements AdminService {
 
     @Autowired
     AdminMapper adminMapper;
@@ -35,7 +35,7 @@ public class AdminServiceImpl implements AdminServive{
     }
 
     @Override
-    public int updateAdmin(Map map) {
-        return adminMapper.updateAdmin(map);
+    public int updateAdmin(Admin admin) {
+        return adminMapper.updateAdmin(admin);
     }
 }

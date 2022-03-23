@@ -2,12 +2,18 @@ package com.ego.controller;
 
 
 import com.ego.pojo.Admin;
-import com.ego.servie.AdminServive;
+import com.ego.servie.AdminService;
+import com.ego.utils.JwtUtils;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,35 +24,64 @@ import java.util.Map;
 public class AdminController {
 
     @Autowired
-    AdminServive adminServive;
+    AdminService adminService;
+    @Autowired
+    JwtUtils jwtUtils;
+    @RequestMapping("/getPage")
+    @ResponseBody
+    public PageInfo<Admin> getPage(@RequestParam Integer pageSize, @RequestParam Integer pageNum){
+        PageHelper.startPage(pageNum,pageSize);
+
+        List<Admin> allAdmin = adminService.getAllAdmin();
+
+        return new PageInfo<>(allAdmin);
+
+    }
+
 
     @GetMapping("/getAllAdmin")
     @ResponseBody
     public List<Admin> getAllAdmin(){
 
-        return adminServive.getAllAdmin();
+        return adminService.getAllAdmin();
 
     }
 
     @PostMapping("/login")
     @ResponseBody
-    public String loginVf(@RequestBody Admin admin){
-        Map<String,String> map = new HashMap<>();
-        map.put("account",admin.getAccount());
+    public String loginVf(@RequestBody Admin admin) throws JSONException {
 
-        Admin adminAt = adminServive.getAdminAt(map);
+        Map<String,Object> map = new HashMap<>();
+        map.put("account",admin.getAccount());
+        JSONObject jsonObject = new JSONObject();
+        Admin adminAt = adminService.getAdminAt(map);
 
         if(adminAt!=null&&adminAt.getPwd().equals(admin.getPwd())){
-            return "true";
+            Map<String,Object> dataMap = new HashMap<>();
+            dataMap.put("id",adminAt.getId());
+
+            dataMap.put("pwd",adminAt.getPwd());
+
+
+            String token= jwtUtils.createJwt(adminAt.getAccount(),adminAt.getName(),dataMap);
+
+                jsonObject.put("state",200);
+                jsonObject.put("token",token);
+
+            return jsonObject.toString();
         }
-        return "false";
+
+            jsonObject.put("state",500);
+
+
+       return  jsonObject.toString();
     }
 
     @RequestMapping("/addAdmin")
     @ResponseBody
     public String addAdmin(@RequestBody Admin admin){
 
-        int res = adminServive.addAdmin(admin);
+        int res = adminService.addAdmin(admin);
         if(res==1){
             return "true";
         }
@@ -57,9 +92,17 @@ public class AdminController {
 
     @RequestMapping("/accountVf")
     @ResponseBody
-    public String accountVf(){
+    public String accountVf(@RequestBody Admin admin){
 
-        return "true";
+        Map<String,Object> map = new HashMap<>();
+        map.put("id",admin.getId());
+        map.put("account",admin.getAccount());
+
+        Admin adminAt = adminService.getAdminAt(map);
+        if(adminAt!=null&&adminAt.getPwd().equals(admin.getPwd())){
+            return "true";
+        }
+        return  "false";
 
     }
 
@@ -67,14 +110,27 @@ public class AdminController {
     @ResponseBody
     public String deleteAdmin(@RequestBody Admin admin){
 
-        int res = adminServive.deleteAdmin(admin);
+        int res = adminService.deleteAdmin(admin);
 
         if(res==1){
             return "true";
         }
         return "false";
+    }
+
+    @RequestMapping("/updateAdmin")
+    @ResponseBody
+    public String updateAdmin(@RequestBody Admin admin){
+
+
+            int res = adminService.updateAdmin(admin);
+            if(res==1){
+                return "true";
+            }
+            else
+                return "false";
+
 
 
     }
-
 }

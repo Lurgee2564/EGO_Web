@@ -19,29 +19,31 @@
     </where>
     </delete>
 <!--更新管理员信息，只允许更改name和psw-->
-    <update id="updateAdmin" parameterType="map">
+    <update id="updateAdmin" parameterType="com.ego.pojo.Admin">
         update egoweb.ego_admin
         <set>
             <if test="name != null">
-                name = #{name}
+                name = #{name},
             </if>
-            <if test="psw != null">
-                psw = #{psw}
+            <if test="pwd != null">
+                pwd = #{pwd}
             </if>
         </set>
+        <where>
+             <if test="account != null">
+                 account = #{account}
+             </if>
+        </where>
     </update>
 <!--获取指定管理员，根据id，name，或者account获取-->
     <select id="getAdminAt" parameterType="map" resultType="com.ego.pojo.Admin">
         select *from egoweb.ego_admin
         <where>
             <if test="id != null">
-                id=#{id}
-            </if>
-            <if test="name != null">
-                name=#{name}
+                id=#{id},
             </if>
             <if test="account != null">
-                account=#{account}
+                account = #{account}
             </if>
         </where>
     </select>
